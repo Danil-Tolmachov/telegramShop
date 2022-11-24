@@ -22,16 +22,16 @@ def user_data():
 @pytest.fixture
 def moker_data():
     cart: dict = {
-        'cart': {
-            1: {
-                'name': 'Laptop',
-                'price': 243
-            },
-            2: {
-                'name': 'Smartphone',
-                'price': 243
-            }
-        } 
+        {
+            'pk': 1,
+            'name': 'Laptop',
+            'price': 243
+        },
+        {
+            'pk': 2,
+            'name': 'Smartphone',
+            'price': 243
+        }
     }
 
     data = {

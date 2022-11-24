@@ -10,119 +10,137 @@ from bot import messages
 @pytest.fixture
 def api_mock_data():
     products: dict = {
-        'products': {
-            1: {
-                'name': 'Laptop',
-                'price': 243
-            },
-            2: {
-                'name': 'Smartphone',
-                'price': 243
+        {
+            'id': 24,
+            'name': 'Tablet',
+            'category': 'Tablet',
+            'price': 345,
+            'characteristics': {
+                'RAM': '8gb',
+                'Display': '18ich',
+                'Storage': '64gb'
             }
-        } 
-    }
-
-    product: dict = {
-        'product': {
-            24: {
-                'name': 'Tablet',
-                'price': 345
+        },
+        {
+            'id': 24,
+            'name': 'Tablet',
+            'category': 'Tablet',
+            'price': 345,
+            'characteristics': {
+                'RAM': '8gb',
+                'Display': '18ich',
+                'Storage': '64gb'
             }
         }
     }
 
-    categories: dict = {
-        'categories': {
-            56: {
-                'name': 'PCs',
-                'url_kwarg': 'pc'
-            },
-            2: {
-                'name': 'PSUs',
-                'url_kwarg': 'pcu'
-            },
-            35: {
-                'name': 'Cases',
-                'url_kwarg': 'case'
+    product: dict = {
+        {
+        'pk': 24,
+        'name': 'Tablet',
+        'category': 'Tablet',
+        'price': 345,
+        'characteristics': {
+            'RAM': '8gb',
+            'Display': '18ich',
+            'Storage': '64gb'
             }
+        },
+    }
+
+    categories: dict = {
+        {
+            'pk': 56,
+            'name': 'PCs',
+            'url_kwarg': 'pc'
+        },
+        {
+            'pk': 2,
+            'name': 'PSUs',
+            'url_kwarg': 'pcu'
+        },
+        {
+            'pk': 35,
+            'name': 'Cases',
+            'url_kwarg': 'case'
         }
     }
 
     category: dict = {
-        'category': {
-            3: {
-                'name': 'PCs',
-                'url_kwarg': 'pc'
-            }
+        {
+            'pk': 3,
+            'name': 'PCs',
+            'url_kwarg': 'pc'
         }
     }
 
     cart: dict = {
-        'cart': {
-            1: {
-                'name': 'Laptop',
-                'price': 243
-            },
-            2: {
-                'name': 'Smartphone',
-                'price': 243
-            }
-        } 
+        {
+            'pk': 1,
+            'name': 'Laptop',
+            'price': 243
+        },
+        {
+            'pk': 2,
+            'name': 'Smartphone',
+            'price': 243
+        }
     }
 
     add_to_cart: dict = {
-        'added': {
-            28: {
-                'name': 'Tablet',
-                'price': 345
-            }
+        {
+            'pk': 28,
+            'name': 'Tablet',
+            'price': 345
         }
     }
 
     del_from_cart: dict = {
-        'deleted': {
-            24: {
-                'name': 'CPU',
-                'price': 674
-            }
+        {
+            'pk': 24,
+            'name': 'CPU',
+            'price': 674
         }
     }
 
     order: dict = {
-        'order': {
-            1: {
-                'name': 'Laptop',
-                'price': 243
-            },
-            76: {
-                'name': 'Tablet',
-                'price': 678
-            },
-            53: {
-                'name': 'Smartphone',
-                'price': 654
-            },
-        }
+        {
+            'pk': 1,
+            'name': 'Laptop',
+            'price': 243
+        },
+        {
+            'pk': 76,
+            'name': 'Tablet',
+            'price': 678
+        },
+        {
+            'pk': 53,
+            'name': 'Smartphone',
+            'price': 654
+        },
+
     }
 
     orders: dict = {
-        'orders': {
-            1: {
-                'order_id': 2,
-                'items_count': 5,
-                'summary': 243
-            },
-            2: {
-                'order_id': 4,
-                'items_count': 2,
-                'summary': 654
-            },
-            3: {
-                'order_id': 52,
-                'items_count': 4,
-                'summary': 278
-            },
-        } 
+        {
+            'pk': 1,
+            'order_id': 2,
+            'items_count': 5,
+            'summary': 243
+        },
+        {
+            'pk': 2,
+            'order_id': 4,
+            'items_count': 2,
+            'summary': 654
+        },
+        {
+            'pk': 3,
+            'order_id': 52,
+            'items_count': 4,
+            'summary': 278
+        },
     }
 
     data: dict = {
@@ -140,7 +158,7 @@ def api_mock_data():
     return data
 
 
-def test_send_welcome(mocker, api_mock_data):
+def test_welcome(mocker, api_mock_data):
     products = api_mock_data['products']
 
     mocker.patch('api_service.get_products', return_value=products)
@@ -148,7 +166,7 @@ def test_send_welcome(mocker, api_mock_data):
     output = messages.welcome()
     assert output
 
-def test_send_products(mocker, api_mock_data):
+def test_products(mocker, api_mock_data):
     products = api_mock_data['products']
 
     mocker.patch('api_service.get_products', return_value=products)
@@ -159,18 +177,21 @@ def test_send_products(mocker, api_mock_data):
     assert output
     assert expected_lines == output.count('\n')
 
-def test_send_product(mocker, api_mock_data):
-    product = api_mock_data['product']
-
+def test_product(mocker, api_mock_data):
+    product = api_mock_data['product']['product']
     mocker.patch('api_service.get_product', return_value=product)
+      
 
-    expected_lines = 1 + 1 #  Product + title line
-    output = messages.product(product['product'])
+    id = product.keys()[0]
+    product = product.values()[0]
+
+    expected_lines = 1 + 1 + len(product['characteristics'].keys()) + 1 + 1 #  Title line + blank + characteristics + black + price
+    output = messages.product(1)
     
     assert output
     assert expected_lines == output.count('\n') 
 
-def test_send_category(mocker, api_mock_data):
+def test_category(mocker, api_mock_data):
     category = api_mock_data['category']
 
     mocker.patch('api_service.get_category', return_value=category)
