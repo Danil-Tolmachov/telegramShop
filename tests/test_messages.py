@@ -9,7 +9,7 @@ from bot import messages
 
 @pytest.fixture
 def api_mock_data():
-    products: dict = {
+    products: list = [
         {
             'id': 24,
             'name': 'Tablet',
@@ -32,23 +32,21 @@ def api_mock_data():
                 'Storage': '64gb'
             }
         }
-    }
+    ]
 
     product: dict = {
-        {
-        'pk': 24,
-        'name': 'Tablet',
-        'category': 'Tablet',
-        'price': 345,
-        'characteristics': {
-            'RAM': '8gb',
-            'Display': '18ich',
-            'Storage': '64gb'
-            }
-        },
-    }
+            'pk': 24,
+            'name': 'Tablet',
+            'category': 'Tablet',
+            'price': 345,
+            'characteristics': {
+                'RAM': '8gb',
+                'Display': '18ich',
+                'Storage': '64gb'
+                }
+        }
 
-    categories: dict = {
+    categories: list = [
         {
             'pk': 56,
             'name': 'PCs',
@@ -64,17 +62,15 @@ def api_mock_data():
             'name': 'Cases',
             'url_kwarg': 'case'
         }
-    }
+    ]
 
     category: dict = {
-        {
             'pk': 3,
             'name': 'PCs',
             'url_kwarg': 'pc'
         }
-    }
 
-    cart: dict = {
+    cart: list = [
         {
             'pk': 1,
             'name': 'Laptop',
@@ -85,25 +81,21 @@ def api_mock_data():
             'name': 'Smartphone',
             'price': 243
         }
-    }
+    ]
 
     add_to_cart: dict = {
-        {
             'pk': 28,
             'name': 'Tablet',
             'price': 345
         }
-    }
 
     del_from_cart: dict = {
-        {
             'pk': 24,
             'name': 'CPU',
             'price': 674
         }
-    }
 
-    order: dict = {
+    order: list = [
         {
             'pk': 1,
             'name': 'Laptop',
@@ -119,10 +111,9 @@ def api_mock_data():
             'name': 'Smartphone',
             'price': 654
         },
+    ]
 
-    }
-
-    orders: dict = {
+    orders: list = [
         {
             'pk': 1,
             'order_id': 2,
@@ -141,7 +132,7 @@ def api_mock_data():
             'items_count': 4,
             'summary': 278
         },
-    }
+    ]
 
     data: dict = {
         'products': products,
