@@ -18,11 +18,10 @@ dp = Dispatcher(bot)
 
 
 
-@dp.message_handler(commands=['start', 'products'])
+@dp.message_handler(commands=['start'])
 async def send_welcome(message: types.Message):
     await message.reply(text=messages.welcome())
     await send_products(message=message.products())
-
 
 
 @dp.message_handler(commands=['products'])
