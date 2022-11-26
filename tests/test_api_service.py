@@ -229,8 +229,8 @@ def test_make_order():
 
 
 def test_get_order():
-    for user_id in range(5):
-        result: dict = api.get_order(user_id)
+    for order_id in range(5):
+        result: dict = api.get_order(order_id)
 
         assert result['order']
         assert result is not None and type(result) is dict

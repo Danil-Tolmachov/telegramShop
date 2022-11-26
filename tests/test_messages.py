@@ -11,7 +11,7 @@ from bot import messages
 def api_mock_data():
     products: list = [
         {
-            'id': 24,
+            'pk': 24,
             'name': 'Tablet',
             'category': 'Tablet',
             'price': 345,
@@ -22,7 +22,7 @@ def api_mock_data():
             }
         },
         {
-            'id': 24,
+            'pk': 24,
             'name': 'Tablet',
             'category': 'Tablet',
             'price': 345,
@@ -115,20 +115,17 @@ def api_mock_data():
 
     orders: list = [
         {
-            'pk': 1,
-            'order_id': 2,
+            'pk': 2,
             'items_count': 5,
             'summary': 243
         },
         {
-            'pk': 2,
-            'order_id': 4,
+            'pk': 4,
             'items_count': 2,
             'summary': 654
         },
         {
-            'pk': 3,
-            'order_id': 52,
+            'pk': 52,
             'items_count': 4,
             'summary': 278
         },
@@ -149,6 +146,7 @@ def api_mock_data():
     return data
 
 
+
 def test_welcome(mocker, api_mock_data):
     products = api_mock_data['products']
 
@@ -157,100 +155,122 @@ def test_welcome(mocker, api_mock_data):
     output = messages.welcome()
     assert output
 
+
 def test_products(mocker, api_mock_data):
     products = api_mock_data['products']
 
     mocker.patch('api_service.get_products', return_value=products)
 
-    output = messages.products(products['products'])
-    expected_lines = len(products['products'].items()) + 1 #  Products count + title line
-
+    output = messages.products(1)
+    expected_lines = len(products) #  Products count
     assert output
     assert expected_lines == output.count('\n')
 
+    output = messages.products(1, title='Products:\n')
+    expected_lines = len(products) + 1 #  Products count + title
+    assert output
+    assert expected_lines == output.count('\n')
+
+
 def test_product(mocker, api_mock_data):
-    product = api_mock_data['product']['product']
+    product = api_mock_data['product']
     mocker.patch('api_service.get_product', return_value=product)
-      
 
-    id = product.keys()[0]
-    product = product.values()[0]
-
-    expected_lines = 1 + 1 + len(product['characteristics'].keys()) + 1 + 1 #  Title line + blank + characteristics + black + price
-    output = messages.product(1)
-    
+    expected_lines = 1 + len(product['characteristics']) #  Product title line + characteristics
+    output = messages.product(1, title='')
     assert output
     assert expected_lines == output.count('\n') 
+ 
+
+    expected_lines = 1 + 1 + len(product['characteristics']) #  Title line + product title line + blank + characteristics
+    output = messages.product(1, title='Product:\n')
+    assert output
+    assert expected_lines == output.count('\n') 
+
 
 def test_category(mocker, api_mock_data):
     category = api_mock_data['category']
 
     mocker.patch('api_service.get_category', return_value=category)
 
-    expected_lines = 1 + 1 #  Category + title line
-    output = messages.category(category['category'])
-    
+    expected_lines = len(category) #  Category fields
+    output = messages.category(2)
     assert output
     assert expected_lines == output.count('\n') 
+
+    expected_lines = len(category) + 1 #  Category fields + title
+    output = messages.category(2, title='Category\n')
+    assert output
+    assert expected_lines == output.count('\n') 
+
 
 def test_add_to_cart(mocker, api_mock_data):
     add_to_cart = api_mock_data['add_to_cart']
 
-    mocker.patch('api_service.add_to_cart', return_value=add_to_cart)
+    mocker.patch('api_service.get_product', return_value=add_to_cart)
 
-    expected_lines = 1 + 1 #  Product + title line
-    output = messages.add_to_cart(add_to_cart['product'])
+    expected_lines = 1 #  Title: product
+    output = messages.add_to_cart(2)
     
     assert output
     assert expected_lines == output.count('\n') 
+
 
 def test_del_from_cart(mocker, api_mock_data):
     del_from_cart = api_mock_data['del_from_cart']
 
-    mocker.patch('api_service.del_from_cart', return_value=del_from_cart)
+    mocker.patch('api_service.get_product', return_value=del_from_cart)
 
-    expected_lines = 1 + 1 #  Product + title line
-    output = messages.del_from_cart(del_from_cart['product'])
-    
+    expected_lines = 1 #  Title: product
+    output = messages.del_from_cart(4)
+
     assert output
     assert expected_lines == output.count('\n') 
 
-def test_send_cart(mocker, api_mock_data):
+
+def test_cart(mocker, api_mock_data):
     cart = api_mock_data['cart']
 
     mocker.patch('api_service.get_cart', return_value=cart)
 
-    expected_lines = len(cart['cart']) + 1 #  Cart products + title line
-    output = messages.cart(cart['cart'])
-    
+    expected_lines = len(cart) #  Cart products 
+    output = messages.cart(2)
     assert output
     assert expected_lines == output.count('\n') 
 
-def test_make_order_title():
-    expected_lines =  1 #  Only title line
-    output = messages.make_order()
-    
+    expected_lines = len(cart) + 1 #  Cart products + title
+    output = messages.cart(2, title='Cart\n')
     assert output
     assert expected_lines == output.count('\n') 
 
-def test_send_order(mocker, api_mock_data):
+
+def test_order(mocker, api_mock_data):
     order = api_mock_data['order']
 
     mocker.patch('api_service.get_order', return_value=order)
 
-    expected_lines = len(order['products']) + 1 #  Order products + title line
-    output = messages.order(order['order'])
-    
+    expected_lines = len(order) #  Order products
+    output = messages.order(order_id=1)
     assert output
     assert expected_lines == output.count('\n') 
 
-def test_send_orders(mocker, api_mock_data):
+    expected_lines = len(order) + 1 #  Order products + title
+    output = messages.order(order_id=1, title='Order\n')
+    assert output
+    assert expected_lines == output.count('\n') 
+
+
+def test_orders(mocker, api_mock_data):
     orders = api_mock_data['orders']
 
     mocker.patch('api_service.get_orders', return_value=orders)
 
-    expected_lines = 1 + 1 #  Category + title line
-    output = messages.orders(orders['orders'])
-    
+    expected_lines = len(orders) #  Orders
+    output = messages.orders(1)
+    assert output
+    assert expected_lines == output.count('\n') 
+
+    expected_lines = len(orders) + 1 #  Orders + title
+    output = messages.orders(1, title='Orders\n')
     assert output
     assert expected_lines == output.count('\n') 
